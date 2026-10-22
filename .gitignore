@@ -1,0 +1,36 @@
+
+# Maven build files
+target/
+
+# Local database files
+data/
+*.mv.db
+*.trace.db
+
+# Java compiled files
+*.class
+
+# IDE settings
+.vscode/
+.idea/
+*.iml
+.settings/
+.project
+.classpath
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Environment and secret files
+.env
+.env.*
+!.env.example
+
+# Keep Maven Wrapper files
+!mvnw
+!mvnw.cmd
+!.mvn/wrapper/maven-wrapper.jar

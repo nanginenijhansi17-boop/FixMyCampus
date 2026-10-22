@@ -1,0 +1,567 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FixMyCampus | Campus Maintenance</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f7fb;
+            color: #263248;
+        }
+
+        header {
+            background: #173b72;
+            color: white;
+            padding: 20px 7%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        header h1 {
+            font-size: 25px;
+        }
+
+        header p {
+            font-size: 13px;
+            margin-top: 5px;
+            color: #dce8ff;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin-left: 18px;
+            font-weight: bold;
+        }
+
+        nav a:hover {
+            color: #8ee4d0;
+        }
+
+        .hero {
+            background: linear-gradient(120deg, #173b72, #2878a8);
+            color: white;
+            padding: 55px 7%;
+            text-align: center;
+        }
+
+        .hero h2 {
+            font-size: 34px;
+            margin-bottom: 14px;
+        }
+
+        .hero p {
+            max-width: 650px;
+            margin: auto;
+            line-height: 1.7;
+        }
+
+        .container {
+            width: 86%;
+            max-width: 1150px;
+            margin: 30px auto;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 18px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 22px;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px #0000000d;
+            border-left: 5px solid #2878a8;
+        }
+
+        .stat-card h3 {
+            color: #65748b;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .stat-card p {
+            font-size: 30px;
+            font-weight: bold;
+            color: #173b72;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+            gap: 25px;
+            align-items: start;
+        }
+
+        .panel {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px #0000000d;
+        }
+
+        .panel h2 {
+            color: #173b72;
+            margin-bottom: 20px;
+            font-size: 22px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 7px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 7px;
+            font-size: 14px;
+            background: white;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #2878a8;
+            box-shadow: 0 0 0 2px #2878a81a;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        button {
+            border: none;
+            background: #176b55;
+            color: white;
+            padding: 13px 18px;
+            border-radius: 7px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background: #10513f;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .submit-btn {
+            width: 100%;
+        }
+
+        .complaint-card {
+            border: 1px solid #e0e7ef;
+            padding: 17px;
+            margin-bottom: 14px;
+            border-radius: 9px;
+            background: #fff;
+            overflow-wrap: anywhere;
+        }
+
+        .complaint-card h3 {
+            color: #173b72;
+            margin-bottom: 10px;
+        }
+
+        .complaint-card p {
+            margin: 7px 0;
+            line-height: 1.5;
+            font-size: 14px;
+        }
+
+        .status {
+            display: inline-block;
+            background: #fff1c2;
+            color: #805900;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .priority-high {
+            color: #c0392b;
+            font-weight: bold;
+        }
+
+        .priority-medium {
+            color: #b7791f;
+            font-weight: bold;
+        }
+
+        .priority-low {
+            color: #176b55;
+            font-weight: bold;
+        }
+
+        .empty-message {
+            color: #65748b;
+            text-align: center;
+            padding: 25px 10px;
+        }
+
+        .message {
+            display: none;
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 7px;
+            font-size: 14px;
+        }
+
+        .message.success {
+            display: block;
+            background: #d9f7e8;
+            color: #176b42;
+        }
+
+        .message.error {
+            display: block;
+            background: #ffe1e1;
+            color: #a32020;
+        }
+
+        footer {
+            text-align: center;
+            background: #173b72;
+            color: white;
+            padding: 22px;
+            margin-top: 40px;
+            font-size: 14px;
+        }
+
+        @media (max-width: 800px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero h2 {
+                font-size: 27px;
+            }
+
+            .container {
+                width: 92%;
+            }
+
+            header {
+                padding: 18px 5%;
+            }
+
+            nav a {
+                margin-left: 0;
+                margin-right: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <div>
+        <h1>FixMyCampus</h1>
+        <p>A better campus starts with us.</p>
+    </div>
+
+    <nav>
+        <a href="#home">Home</a>
+        <a href="#report">Report Issue</a>
+        <a href="#dashboard">Dashboard</a>
+    </nav>
+</header>
+
+<section class="hero" id="home">
+    <h2>Let's Make Our Campus Better!</h2>
+    <p>
+        Report broken fans, damaged lights, water leaks and other
+        campus maintenance problems. Track complaints and help
+        create a cleaner, safer and better learning environment.
+    </p>
+</section>
+
+<main class="container">
+
+    <section class="stats">
+        <div class="stat-card">
+            <h3>Total Complaints</h3>
+            <p id="complaintCount">0</p>
+        </div>
+
+        <div class="stat-card">
+            <h3>Pending Complaints</h3>
+            <p id="pendingCount">0</p>
+        </div>
+
+        <div class="stat-card">
+            <h3>Resolved Complaints</h3>
+            <p id="resolvedCount">0</p>
+        </div>
+    </section>
+
+    <div class="main-grid">
+
+        <section class="panel" id="report">
+            <h2>Report a Campus Issue</h2>
+
+            <div id="formMessage" class="message" role="status"
+                 aria-live="polite"></div>
+
+            <form id="complaintForm">
+                <div class="form-group">
+                    <label for="title">Complaint Title</label>
+                    <input type="text" id="title" name="title"
+                           placeholder="e.g. Broken classroom fan"
+                           maxlength="150" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="location">Campus Location</label>
+                    <input type="text" id="location" name="location"
+                           placeholder="e.g. Block A, Room 101"
+                           maxlength="150" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="category">Category</label>
+                    <select id="category" name="category" required>
+                        <option value="">Select category</option>
+                        <option value="Electrical">Electrical</option>
+                        <option value="Plumbing">Plumbing</option>
+                        <option value="Furniture">Furniture</option>
+                        <option value="Cleanliness">Cleanliness</option>
+                        <option value="Internet">Internet / Wi-Fi</option>
+                        <option value="Classroom Equipment">Classroom Equipment</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="priority">Priority</label>
+                    <select id="priority" name="priority" required>
+                        <option value="">Select priority</option>
+                        <option value="High">High</option>
+                        <option value="Medium">Medium</option>
+                        <option value="Low">Low</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea id="description" name="description"
+                              placeholder="Explain the problem..."
+                              maxlength="2000" required></textarea>
+                </div>
+
+                <button type="submit" id="submitBtn" class="submit-btn">
+                    Submit Complaint
+                </button>
+            </form>
+        </section>
+
+        <section class="panel" id="dashboard">
+            <h2>Complaint Dashboard</h2>
+
+            <div id="complaints">
+                <p class="empty-message">Loading complaints...</p>
+            </div>
+        </section>
+
+    </div>
+</main>
+
+<footer>
+    <p>FixMyCampus &copy; 2026 | Building a Better Campus Together</p>
+</footer>
+
+<script>
+    const form = document.getElementById("complaintForm");
+    const complaintsContainer = document.getElementById("complaints");
+    const countElement = document.getElementById("complaintCount");
+    const pendingCountElement = document.getElementById("pendingCount");
+    const resolvedCountElement = document.getElementById("resolvedCount");
+    const formMessage = document.getElementById("formMessage");
+    const submitBtn = document.getElementById("submitBtn");
+
+    function showMessage(message, type) {
+        formMessage.textContent = message;
+        formMessage.className = "message " + type;
+    }
+
+    function createTextElement(tag, text, className) {
+        const element = document.createElement(tag);
+        element.textContent = text;
+
+        if (className) {
+            element.className = className;
+        }
+
+        return element;
+    }
+
+    function displayComplaint(complaint) {
+        const card = document.createElement("article");
+        card.className = "complaint-card";
+
+        const title = createTextElement("h3", complaint.title || "Untitled complaint");
+
+        const location = createTextElement(
+            "p", "Location: " + (complaint.location || "Not provided")
+        );
+
+        const category = createTextElement(
+            "p", "Category: " + (complaint.category || "Other")
+        );
+
+        const priorityValue = complaint.priority || "Medium";
+        const priorityClass = "priority-" + priorityValue.toLowerCase();
+
+        const priority = createTextElement(
+            "p", "Priority: " + priorityValue, priorityClass
+        );
+
+        const description = createTextElement(
+            "p", "Description: " + (complaint.description || "No description")
+        );
+
+        const status = createTextElement(
+            "span", "Status: " + (complaint.status || "Pending"), "status"
+        );
+
+        card.append(title, location, category, priority, description, status);
+        complaintsContainer.prepend(card);
+    }
+
+    function updateCounts(complaints) {
+        countElement.textContent = complaints.length;
+
+        const pending = complaints.filter(
+            item => (item.status || "Pending").toLowerCase() === "pending"
+        ).length;
+
+        const resolved = complaints.filter(
+            item => (item.status || "").toLowerCase() === "resolved"
+        ).length;
+
+        pendingCountElement.textContent = pending;
+        resolvedCountElement.textContent = resolved;
+    }
+
+    async function loadComplaints() {
+        try {
+            const response = await fetch("/api/complaints");
+
+            if (!response.ok) {
+                throw new Error("Server returned " + response.status);
+            }
+
+            const complaints = await response.json();
+
+            complaintsContainer.innerHTML = "";
+
+            if (complaints.length === 0) {
+                complaintsContainer.innerHTML =
+                    '<p class="empty-message">No complaints yet. Be the first to report an issue!</p>';
+            } else {
+                complaints.forEach(displayComplaint);
+            }
+
+            updateCounts(complaints);
+
+        } catch (error) {
+            console.error("Error loading complaints:", error);
+
+            complaintsContainer.innerHTML =
+                '<p class="empty-message">Could not load complaints. Please check whether the Spring Boot server is running.</p>';
+        }
+    }
+
+    form.addEventListener("submit", async function(event) {
+        event.preventDefault();
+
+        if (!form.reportValidity()) {
+            return;
+        }
+
+        const complaint = {
+            title: form.elements["title"].value.trim(),
+            location: form.elements["location"].value.trim(),
+            category: form.elements["category"].value,
+            priority: form.elements["priority"].value,
+            description: form.elements["description"].value.trim()
+        };
+
+        if (!complaint.title || !complaint.location ||
+            !complaint.category || !complaint.priority ||
+            !complaint.description) {
+            showMessage("Please fill in all fields.", "error");
+            return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Submitting...";
+
+        try {
+            const response = await fetch("/api/complaints", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(complaint)
+            });
+
+            if (!response.ok) {
+                throw new Error("Server returned " + response.status);
+            }
+
+            await response.json();
+
+            showMessage("Complaint submitted successfully!", "success");
+            form.reset();
+
+            await loadComplaints();
+
+        } catch (error) {
+            console.error("Error submitting complaint:", error);
+
+            showMessage(
+                "Complaint could not be submitted. Check the Spring Boot terminal.",
+                "error"
+            );
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = "Submit Complaint";
+        }
+    });
+
+    loadComplaints();
+</script>
+
+</body>
+</html>
