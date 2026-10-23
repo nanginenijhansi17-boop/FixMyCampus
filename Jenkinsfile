@@ -1,4 +1,3 @@
-
 pipeline {
     agent any
 
@@ -10,20 +9,18 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                echo 'FixMyCampus source code checked out from GitHub'
+                echo 'Source code checked out from GitHub'
             }
         }
 
         stage('Build with Maven') {
             steps {
-                bat 'mvn -version'
                 bat 'mvn clean package -DskipTests'
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                bat 'docker.exe --version'
                 bat 'docker.exe build -t %DOCKER_IMAGE% .'
             }
         }
@@ -48,6 +45,14 @@ pipeline {
             }
         }
 
+        stage('Deploy to Kubernetes') {
+            steps {
+                bat 'kubectl apply -f k8s/deployment.yaml'
+                bat 'kubectl set image deployment/fixmycampus fixmycampus=%DOCKER_IMAGE%'
+                bat 'kubectl rollout status deployment/fixmycampus --timeout=120s'
+            }
+        }
+
         stage('Docker Logout') {
             steps {
                 bat 'docker.exe logout'
@@ -57,15 +62,13 @@ pipeline {
 
     post {
         success {
-            echo 'SUCCESS: FixMyCampus image built and pushed to Docker Hub!'
+            echo 'SUCCESS: FixMyCampus built, pushed, and deployed!'
         }
-
         failure {
-            echo 'FAILURE: Check the Jenkins Console Output for the error.'
+            echo 'FAILURE: Check Console Output for the error.'
         }
-
         always {
-            echo 'FixMyCampus pipeline execution completed.'
+            echo 'FixMyCampus pipeline completed.'
         }
     }
 }
