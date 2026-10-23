@@ -5,19 +5,20 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                echo 'Source code will be checked out from GitHub.'
+                echo 'FixMyCampus source code checked out from GitHub'
             }
         }
 
-        stage('Build') {
+        stage('Build with Maven') {
             steps {
-                echo 'Building FixMyCampus with Maven'
+                bat 'mvn -version'
+                bat 'mvn clean package -DskipTests'
             }
         }
 
-        stage('Docker') {
+        stage('Build Docker Image') {
             steps {
-                echo 'Preparing the FixMyCampus Docker image'
+                bat 'docker build -t jaanu1317/fixmycampus:latest .'
             }
         }
     }
