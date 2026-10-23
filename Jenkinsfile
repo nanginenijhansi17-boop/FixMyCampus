@@ -2,6 +2,10 @@
 pipeline {
     agent any
 
+    environment {
+        PATH = "C:\\Users\\mouni\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin;${env.PATH}"
+    }
+
     stages {
         stage('Checkout') {
             steps {
@@ -18,7 +22,8 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                bat 'docker build -t jaanu1317/fixmycampus:latest .'
+                bat 'docker.exe --version'
+                bat 'docker.exe build -t jaanu1317/fixmycampus:latest .'
             }
         }
     }
