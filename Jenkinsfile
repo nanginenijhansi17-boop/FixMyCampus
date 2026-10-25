@@ -1,12 +1,18 @@
+
 pipeline {
     agent any
 
     environment {
         PATH = "C:\\Users\\mouni\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin;${env.PATH}"
+
         DOCKER_IMAGE = "jaanu1317/fixmycampus:latest"
+
+        // Docker Desktop Kubernetes configuration
+        KUBECONFIG = "C:\\Users\\mouni\\.kube\\config"
     }
 
     stages {
+
         stage('Checkout') {
             steps {
                 echo 'Source code checked out from GitHub'
@@ -34,7 +40,10 @@ pipeline {
                         passwordVariable: 'DOCKER_PASS'
                     )
                 ]) {
-                    bat '@echo off\r\necho %DOCKER_PASS%| docker.exe login --username %DOCKER_USER% --password-stdin'
+                    bat '''
+                        @echo off
+                        echo %DOCKER_PASS% | docker.exe login --username %DOCKER_USER% --password-stdin
+                    '''
                 }
             }
         }
@@ -45,11 +54,26 @@ pipeline {
             }
         }
 
+        stage('Check Kubernetes Connection') {
+            steps {
+                bat 'where kubectl'
+                bat 'kubectl config current-context'
+                bat 'kubectl cluster-info'
+                bat 'kubectl get nodes'
+            }
+        }
+
         stage('Deploy to Kubernetes') {
             steps {
                 bat 'kubectl apply -f k8s/deployment.yaml'
+
                 bat 'kubectl set image deployment/fixmycampus fixmycampus=%DOCKER_IMAGE%'
+
                 bat 'kubectl rollout status deployment/fixmycampus --timeout=120s'
+
+                bat 'kubectl get deployments'
+                bat 'kubectl get pods'
+                bat 'kubectl get services'
             }
         }
 
@@ -64,9 +88,11 @@ pipeline {
         success {
             echo 'SUCCESS: FixMyCampus built, pushed, and deployed!'
         }
+
         failure {
-            echo 'FAILURE: Check Console Output for the error.'
+            echo 'FAILURE: Check Console Output for the stage that failed.'
         }
+
         always {
             echo 'FixMyCampus pipeline completed.'
         }
