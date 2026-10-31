@@ -3,89 +3,92 @@ pipeline {
     agent any
 
     environment {
-        PATH = "C:\\Users\\mouni\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin;${env.PATH}"
-        DOCKER_IMAGE = "jaanu1317/fixmycampus:latest"
-        KUBECONFIG = "C:\\Users\\mouni\\.kube\\config"
+        DOCKER_IMAGE = 'jaanu1317/fixmycampus:latest'
     }
 
     stages {
+
+        // Stage 1: Checkout
         stage('Checkout') {
             steps {
                 echo 'Source code checked out from GitHub'
             }
         }
 
+        // Stage 2: Build with Maven
         stage('Build with Maven') {
             steps {
                 bat 'mvn clean package -DskipTests'
             }
         }
 
+        // Stage 3: Build Docker Image
         stage('Build Docker Image') {
             steps {
-                bat 'docker.exe build -t %DOCKER_IMAGE% .'
+                bat 'docker build -t %DOCKER_IMAGE% .'
             }
         }
 
+        // Stage 4: Login to Docker Hub
         stage('Login to Docker Hub') {
             steps {
                 withCredentials([
                     usernamePassword(
-                        credentialsId: 'dockerhub-new',
+                        credentialsId: 'dockerhub-creds',
                         usernameVariable: 'DOCKER_USER',
                         passwordVariable: 'DOCKER_PASS'
                     )
                 ]) {
                     bat '''
                         @echo off
-                        echo %DOCKER_PASS% | docker.exe login --username %DOCKER_USER% --password-stdin
+                        echo %DOCKER_PASS% | docker login --username %DOCKER_USER% --password-stdin
                     '''
                 }
             }
         }
 
+        // Stage 5: Push to Docker Hub
         stage('Push to Docker Hub') {
             steps {
-                bat 'docker.exe push %DOCKER_IMAGE%'
+                bat 'docker push %DOCKER_IMAGE%'
             }
         }
 
+        // Stage 6: Check Kubernetes Connection
         stage('Check Kubernetes Connection') {
             steps {
-                bat 'where kubectl'
-                bat 'kubectl config current-context'
                 bat 'kubectl cluster-info'
                 bat 'kubectl get nodes'
             }
         }
 
+        // Stage 7: Deploy to Kubernetes
         stage('Deploy to Kubernetes') {
             steps {
-                bat 'kubectl apply -f k8s/deployment.yaml'
-                bat 'kubectl set image deployment/fixmycampus fixmycampus=%DOCKER_IMAGE%'
-                bat 'kubectl rollout status deployment/fixmycampus --timeout=120s'
-                bat 'kubectl get deployments'
-                bat 'kubectl get pods'
-                bat 'kubectl get services'
+                bat 'kubectl apply -f k8s/'
+                bat 'kubectl rollout status deployment/fixmycampus'
             }
         }
 
+        // Stage 8: Docker Logout
         stage('Docker Logout') {
             steps {
-                bat 'docker.exe logout'
+                bat 'docker logout'
             }
         }
     }
 
     post {
         success {
-            echo 'SUCCESS: FixMyCampus built, pushed, and deployed!'
+            echo 'SUCCESS: FixMyCampus CI/CD pipeline completed!'
         }
+
         failure {
             echo 'FAILURE: Check Console Output for the error.'
         }
+
         always {
-            echo 'FixMyCampus pipeline completed.'
+            echo 'FixMyCampus pipeline execution finished.'
         }
     }
 }
