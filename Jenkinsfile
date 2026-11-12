@@ -4,7 +4,6 @@ pipeline {
 
     stages {
 
-        // Stage 1: Checkout source code from GitHub
         stage('Checkout') {
             steps {
                 checkout scm
@@ -12,43 +11,59 @@ pipeline {
             }
         }
 
-        // Stage 2: Build the application using Maven
         stage('Maven Build') {
             steps {
                 bat 'mvnw.cmd clean package -DskipTests'
-                echo 'Maven build completed successfully!'
+                echo 'Maven build completed!'
             }
         }
 
-        // Stage 3: Run application tests
         stage('Test') {
             steps {
                 bat 'mvnw.cmd test'
-                echo 'All tests completed successfully!'
+                echo 'Tests completed!'
             }
         }
 
-        // Stage 4: Build Docker image
         stage('Docker Build') {
             steps {
                 bat '"C:\\Users\\mouni\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\docker.exe" build -t fixmycampus:1.0 .'
-                echo 'Docker image built successfully!'
+                echo 'Docker image built!'
+            }
+        }
+
+        stage('Docker Hub Login and Push') {
+            steps {
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'dockerhub-creds',
+                        usernameVariable: 'DOCKERHUB_USER',
+                        passwordVariable: 'DOCKERHUB_TOKEN'
+                    )
+                ]) {
+                    bat '''
+                    echo %DOCKERHUB_TOKEN% | "C:\\Users\\mouni\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\docker.exe" login --username %DOCKERHUB_USER% --password-stdin
+
+                    "C:\\Users\\mouni\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\docker.exe" tag fixmycampus:1.0 %DOCKERHUB_USER%/fixmycampus:1.0
+
+                    "C:\\Users\\mouni\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\docker.exe" push %DOCKERHUB_USER%/fixmycampus:1.0
+                    '''
+                }
             }
         }
     }
 
-    // Pipeline result messages
     post {
         success {
-            echo 'SUCCESS: FixMyCampus CI/CD Pipeline completed!'
+            echo 'SUCCESS: FixMyCampus image pushed to Docker Hub!'
         }
 
         failure {
-            echo 'FAILURE: Pipeline failed. Check Console Output.'
+            echo 'Pipeline failed. Check Console Output.'
         }
 
         always {
-            echo 'FixMyCampus Pipeline execution finished.'
+            echo 'FixMyCampus pipeline execution finished.'
         }
     }
 }
