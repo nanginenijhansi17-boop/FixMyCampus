@@ -12,7 +12,7 @@ pipeline {
             }
         }
 
-        // Stage 2: Build the project using Maven
+        // Stage 2: Build application using Maven
         stage('Maven Build') {
             steps {
                 bat 'mvnw.cmd clean package -DskipTests'
@@ -55,7 +55,7 @@ if not exist "%DOCKER_CONFIG%" mkdir "%DOCKER_CONFIG%"
 
 echo {"auths":{}} > "%DOCKER_CONFIG%\\config.json"
 
-echo %DOCKERHUB_TOKEN% | "C:\\Users\\mouni\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\docker.exe" login --username %DOCKERHUB_USER% --password-stdin
+powershell.exe -NoProfile -NonInteractive -Command "$env:DOCKERHUB_TOKEN | & 'C:\\Users\\mouni\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\docker.exe' login --username $env:DOCKERHUB_USER --password-stdin"
 
 if errorlevel 1 goto failed
 
@@ -83,17 +83,17 @@ exit /b 1
     post {
 
         success {
-            echo 'SUCCESS: FixMyCampus pipeline completed!'
+            echo 'SUCCESS: FixMyCampus CI/CD pipeline completed!'
             echo 'Docker image pushed to Docker Hub successfully!'
         }
 
         failure {
             echo 'FAILURE: Pipeline execution failed.'
-            echo 'Please check the Jenkins Console Output.'
+            echo 'Please check Jenkins Console Output.'
         }
 
         always {
-            echo 'FixMyCampus CI/CD pipeline execution finished.'
+            echo 'FixMyCampus pipeline execution finished.'
         }
     }
 }
