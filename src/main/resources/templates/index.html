@@ -1,0 +1,110 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FixMyCampus - Complaint Management</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+
+<body>
+
+<header>
+    <h1>FixMyCampus</h1>
+    <p>Your Campus, Your Voice, Our Responsibility</p>
+</header>
+
+<div class="container">
+
+    <section class="form-section">
+        <h2>Submit a Complaint</h2>
+
+        <form th:action="@{/submit}"
+              th:object="${complaint}"
+              method="post">
+
+            <label>Student Name</label>
+            <input type="text"
+                   th:field="*{studentName}"
+                   placeholder="Enter your name"
+                   required>
+
+            <label>Roll Number</label>
+            <input type="text"
+                   th:field="*{rollNumber}"
+                   placeholder="Enter your roll number"
+                   required>
+
+            <label>Complaint Category</label>
+            <select th:field="*{category}" required>
+                <option value="">Select Category</option>
+                <option value="Classroom">Classroom</option>
+                <option value="Hostel">Hostel</option>
+                <option value="Library">Library</option>
+                <option value="Canteen">Canteen</option>
+                <option value="Electrical">Electrical</option>
+                <option value="Water">Water Supply</option>
+                <option value="Other">Other</option>
+            </select>
+
+            <label>Complaint Description</label>
+            <textarea th:field="*{description}"
+                      placeholder="Describe your problem"
+                      required></textarea>
+
+            <button type="submit">Submit Complaint</button>
+        </form>
+    </section>
+
+    <section class="dashboard">
+        <h2>Complaint Dashboard</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Student</th>
+                    <th>Roll Number</th>
+                    <th>Category</th>
+                    <th>Description</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr th:each="c : ${complaints}">
+                    <td th:text="${c.id}"></td>
+                    <td th:text="${c.studentName}"></td>
+                    <td th:text="${c.rollNumber}"></td>
+                    <td th:text="${c.category}"></td>
+                    <td th:text="${c.description}"></td>
+                    <td th:text="${c.status}"></td>
+                    <td>
+                        <a th:href="@{/update/{id}(id=${c.id})}">
+                            Resolve
+                        </a>
+                        |
+                        <a th:href="@{/delete/{id}(id=${c.id})}"
+                           onclick="return confirm('Delete this complaint?')">
+                            Delete
+                        </a>
+                    </td>
+                </tr>
+
+                <tr th:if="${#lists.isEmpty(complaints)}">
+                    <td colspan="7">No complaints submitted yet.</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+</div>
+
+<footer>
+    <p>FixMyCampus | Smart Campus Complaint Management System</p>
+</footer>
+
+</body>
+</html>
