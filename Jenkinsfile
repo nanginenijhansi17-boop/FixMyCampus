@@ -4,7 +4,7 @@ pipeline {
 
     stages {
 
-        // Stage 1: Checkout source code from GitHub
+        // STAGE 1: CHECKOUT FROM GITHUB
         stage('Checkout') {
             steps {
                 checkout scm
@@ -12,7 +12,7 @@ pipeline {
             }
         }
 
-        // Stage 2: Build application using Maven
+        // STAGE 2: MAVEN BUILD
         stage('Maven Build') {
             steps {
                 bat 'mvnw.cmd clean package -DskipTests'
@@ -20,7 +20,7 @@ pipeline {
             }
         }
 
-        // Stage 3: Run application tests
+        // STAGE 3: RUN TEST CASES
         stage('Test') {
             steps {
                 bat 'mvnw.cmd test'
@@ -28,15 +28,17 @@ pipeline {
             }
         }
 
-        // Stage 4: Build Docker image
+        // STAGE 4: BUILD DOCKER IMAGE
         stage('Docker Build') {
             steps {
-                bat '"C:\\Users\\mouni\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\docker.exe" build -t fixmycampus:1.0 .'
+                bat '''
+"C:\\Users\\mouni\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\docker.exe" build -t fixmycampus:1.0 .
+'''
                 echo 'Docker image built successfully!'
             }
         }
 
-        // Stage 5: Login to Docker Hub and push image
+        // STAGE 5: DOCKER HUB LOGIN AND PUSH
         stage('Docker Hub Login and Push') {
             steps {
                 withCredentials([
@@ -77,14 +79,35 @@ exit /b 1
                 }
             }
         }
+
+        // STAGE 6: KUBERNETES DEPLOYMENT
+        stage('Kubernetes Deployment') {
+            steps {
+                bat '''
+"C:\\Users\\mouni\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\kubectl.exe" --kubeconfig="C:\\ProgramData\\Jenkins\\.kube\\config" apply -f k8s/deployment.yaml
+
+if errorlevel 1 exit /b 1
+
+"C:\\Users\\mouni\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\kubectl.exe" --kubeconfig="C:\\ProgramData\\Jenkins\\.kube\\config" apply -f k8s/service.yaml
+
+if errorlevel 1 exit /b 1
+
+"C:\\Users\\mouni\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\kubectl.exe" --kubeconfig="C:\\ProgramData\\Jenkins\\.kube\\config" rollout status deployment/fixmycampus-deployment --timeout=180s
+
+if errorlevel 1 exit /b 1
+
+"C:\\Users\\mouni\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\kubectl.exe" --kubeconfig="C:\\ProgramData\\Jenkins\\.kube\\config" get pods
+'''
+                echo 'Kubernetes deployment completed successfully!'
+            }
+        }
     }
 
-    // Post-build actions
     post {
-
         success {
             echo 'SUCCESS: FixMyCampus CI/CD pipeline completed!'
-            echo 'Docker image pushed to Docker Hub successfully!'
+            echo 'Docker image pushed to Docker Hub!'
+            echo 'Application deployed to Kubernetes!'
         }
 
         failure {
