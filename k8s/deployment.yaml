@@ -1,0 +1,27 @@
+
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: fixmycampus-deployment
+
+spec:
+  replicas: 2
+
+  selector:
+    matchLabels:
+      app: fixmycampus
+
+  template:
+    metadata:
+      labels:
+        app: fixmycampus
+
+    spec:
+      containers:
+        - name: fixmycampus-container
+          image: jaanu1317/fixmycampus:1.0
+          imagePullPolicy: Always
+
+          ports:
+            - containerPort: 8082
