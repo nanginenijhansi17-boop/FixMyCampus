@@ -20,6 +20,12 @@ pipeline {
                 bat 'mvnw.cmd test'
             }
         }
+
+        stage('Docker Build') {
+            steps {
+                bat 'docker build -t fixmycampus:1.0 .'
+            }
+        }
     }
 
     post {
@@ -27,7 +33,7 @@ pipeline {
             echo 'FixMyCampus Pipeline completed successfully!'
         }
         failure {
-            echo 'FixMyCampus Pipeline failed. Check the console output.'
+            echo 'Pipeline failed. Check Console Output.'
         }
     }
 }
